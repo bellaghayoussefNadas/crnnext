@@ -1,0 +1,355 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  admin
+  agent
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  unqualified
+  converted
+}
+
+// enum DealStage is removed since we are moving to PipelineStage model
+
+enum ActivityType {
+  call
+  email
+  meeting
+  note
+}
+
+enum CampaignStatus {
+  draft
+  running
+  completed
+  cancelled
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(agent)
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads      Lead[]
+  deals      Deal[]
+  accounts   Account[]
+  contacts   Contact[]
+  activities Activity[]
+  tasks      Task[]
+  quotes     Quote[]
+  invoices   Invoice[]
+
+  @@map("users")
+}
+
+// ─── Account (Enterprise) ─────────────────────────────────────────────────────
+
+model Account {
+  id        String   @id @default(cuid())
+  name      String
+  industry  String?
+  website   String?
+  phone     String?
+  address   String?
+  city      String?
+  country   String?
+  notes     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts   Contact[]
+  deals      Deal[]
+  invoices   Invoice[]
+  activities Activity[]
+  documents  Document[]
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("accounts")
+}
+
+// ─── Contact ──────────────────────────────────────────────────────────────────
+
+model Contact {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  position  String?
+  notes     String?  @db.Text
+  tags      String?  // JSON-encoded array
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  leads      Lead[]
+  activities Activity[]
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("contacts")
+}
+
+// ─── Lead ─────────────────────────────────────────────────────────────────────
+
+model Lead {
+  id          String     @id @default(cuid())
+  title       String
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  company     String?
+  source      String?    // website, referral, social…
+  status      LeadStatus @default(new)
+  score       Int        @default(0)
+  value       Float      @default(0)
+  notes       String?    @db.Text
+  convertedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  activities Activity[]
+
+  @@map("leads")
+}
+
+// ─── Deal ─────────────────────────────────────────────────────────────────────
+
+model Deal {
+  id          String    @id @default(cuid())
+  title       String
+  amount      Float     @default(0)
+  probability Int       @default(20) // 0-100 %
+  stageId     String?
+  stage       PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
+  closeDate   DateTime?
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  activities Activity[]
+  quotes     Quote[]
+  invoices   Invoice[]
+
+  @@map("deals")
+}
+
+// ─── Activity ─────────────────────────────────────────────────────────────────
+
+model Activity {
+  id          String       @id @default(cuid())
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  scheduledAt DateTime?
+  doneAt      DateTime?
+  isDone      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  leadId    String?
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  @@map("activities")
+}
+
+// ─── Task ─────────────────────────────────────────────────────────────────────
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  dueDate     DateTime?
+  isDone      Boolean  @default(false)
+  priority    String   @default("medium") // low, medium, high
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("tasks")
+}
+
+// ─── Quote ────────────────────────────────────────────────────────────────────
+
+model Quote {
+  id          String      @id @default(cuid())
+  number      String      @unique
+  title       String
+  status      String      @default("draft") // draft, sent, accepted, refused
+  validUntil  DateTime?
+  notes       String?     @db.Text
+  totalAmount Float       @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  dealId String?
+  deal   Deal?   @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  lines     QuoteLine[]
+  invoices  Invoice[]
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("quotes")
+}
+
+model QuoteLine {
+  id          String @id @default(cuid())
+  description String
+  quantity    Float  @default(1)
+  unitPrice   Float  @default(0)
+  discount    Float  @default(0) // percentage
+  total       Float  @default(0)
+
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@map("quote_lines")
+}
+
+// ─── Invoice ──────────────────────────────────────────────────────────────────
+
+model Invoice {
+  id          String    @id @default(cuid())
+  number      String    @unique
+  title       String
+  status      String    @default("draft") // draft, sent, paid, overdue
+  dueDate     DateTime?
+  paidAt      DateTime?
+  notes       String?   @db.Text
+  totalAmount Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  quoteId   String?
+  quote     Quote?   @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  lines InvoiceLine[]
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("invoices")
+}
+
+model InvoiceLine {
+  id          String @id @default(cuid())
+  description String
+  quantity    Float  @default(1)
+  unitPrice   Float  @default(0)
+  discount    Float  @default(0)
+  total       Float  @default(0)
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_lines")
+}
+
+// ─── Campaign ─────────────────────────────────────────────────────────────────
+
+model Campaign {
+  id          String         @id @default(cuid())
+  name        String
+  subject     String
+  body        String         @db.LongText
+  status      CampaignStatus @default(draft)
+  sentAt      DateTime?
+  totalSent   Int            @default(0)
+  totalFailed Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("campaigns")
+}
+
+// ─── Document ─────────────────────────────────────────────────────────────────
+
+model Document {
+  id        String   @id @default(cuid())
+  name      String
+  path      String   // file path on disk / cloud URL
+  mimeType  String?
+  size      Int?     // bytes
+  createdAt DateTime @default(now())
+
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  @@map("documents")
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+model Settings {
+  id         String @id @default(cuid())
+  key        String @unique
+  value      String @db.Text
+
+  @@map("settings")
+}
+
+model PipelineStage {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  label     String
+  color     String   @default("oklch(0.60 0.22 255)")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deals     Deal[]
+
+  @@map("pipeline_stages")
+}

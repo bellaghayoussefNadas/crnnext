@@ -1,0 +1,20 @@
+﻿src/components/accounts/AccountsView.tsx(162,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/activities/ActivitiesView.tsx(273,27): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/campaigns/CampaignsView.tsx(101,28): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/contacts/ContactsView.tsx(166,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/deals/KanbanBoard.tsx(180,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/invoices/InvoicesView.tsx(151,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/layout/Topbar.tsx(63,32): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/leads/LeadsTable.tsx(225,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/leads/LeadsTable.tsx(245,9): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type '{ id: string; source: string | null; title: string; email: string | null; value: number; status: LeadStatus; phone: string | null; notes: string | null; createdAt: Date; ... 7 more ...; convertedAt: Date | null; }[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type '{ id: string; source: string | null; title: string; email: string | null; value: number; status: LeadStatus; phone: string | null; notes: string | null; createdAt: Date; ... 7 more ...; convertedAt: Date | null; }': id, source, title, email, and 13 more.
+src/components/quotes/QuotesView.tsx(190,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.

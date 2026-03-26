@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=mysql://crmrr:crmrr_password@db:3306/crmrr
+      - SESSION_SECRET=your-super-secret-key-change-in-production-minimum-32-chars
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - crm_network
+    restart: always
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=crmrr
+      - MYSQL_USER=crmrr
+      - MYSQL_PASSWORD=crmrr_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - crm_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    restart: always
+
+networks:
+  crm_network:
+    driver: bridge
+
+volumes:
+  db_data:

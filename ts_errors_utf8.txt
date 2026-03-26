@@ -1,0 +1,52 @@
+﻿src/app/(dashboard)/dashboard/page.tsx(10,26): error TS2307: Cannot find module '@/components/ui/skeleton' or its corresponding type declarations.
+src/app/(dashboard)/dashboard/page.tsx(219,29): error TS7006: Parameter 'deal' implicitly has an 'any' type.
+src/app/(dashboard)/dashboard/page.tsx(265,37): error TS7006: Parameter 'act' implicitly has an 'any' type.
+src/app/(dashboard)/search/page.tsx(45,31): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/app/(dashboard)/search/page.tsx(59,28): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/app/(dashboard)/search/page.tsx(74,31): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/app/(dashboard)/settings/page.tsx(10,33): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/app/(dashboard)/settings/page.tsx(10,38): error TS7006: Parameter 'current' implicitly has an 'any' type.
+src/app/actions/accounts.ts(25,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ name: string; industry?: string | undefined; website?: string | undefined; phone?: string | undefined; address?: string | undefined; city?: string | undefined; country?: string | undefined; notes?: string | undefined; }>'.
+src/app/actions/accounts.ts(35,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ name: string; industry?: string | undefined; website?: string | undefined; phone?: string | undefined; address?: string | undefined; city?: string | undefined; country?: string | undefined; notes?: string | undefined; }>'.
+src/app/actions/accounts.ts(63,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ firstName: string; lastName: string; email?: string | undefined; phone?: string | undefined; position?: string | undefined; notes?: string | undefined; accountId?: string | undefined; }>'.
+src/app/actions/activities.ts(29,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ type: "email" | "call" | "meeting" | "note"; title: string; description?: string | undefined; scheduledAt?: string | undefined; leadId?: string | undefined; contactId?: string | undefined; accountId?: string | undefined; }>'.
+src/app/actions/auth.ts(30,34): error TS2339: Property 'errors' does not exist on type 'ZodError<{ email: string; password: string; }>'.
+src/app/actions/campaigns.ts(66,45): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/app/actions/deals.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'DealStage'.
+src/app/actions/deals.ts(30,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ title: string; amount: number; stage: "lead" | "contacted" | "negotiation" | "won" | "lost"; probability?: number | undefined; notes?: string | undefined; accountId?: string | undefined; }>'.
+src/app/actions/deals.ts(67,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ title: string; amount: number; stage: "lead" | "contacted" | "negotiation" | "won" | "lost"; probability?: number | undefined; notes?: string | undefined; accountId?: string | undefined; }>'.
+src/app/actions/leads.ts(34,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ title: string; firstName: string; lastName: string; status: "contacted" | "new" | "qualified" | "unqualified" | "converted"; value: number; email?: string | undefined; phone?: string | undefined; company?: string | undefined; source?: string | undefined; score?: number | undefined; notes?: string | undefi...'.
+src/app/actions/leads.ts(70,53): error TS2339: Property 'errors' does not exist on type 'ZodError<{ title: string; firstName: string; lastName: string; status: "contacted" | "new" | "qualified" | "unqualified" | "converted"; value: number; email?: string | undefined; phone?: string | undefined; company?: string | undefined; source?: string | undefined; score?: number | undefined; notes?: string | undefi...'.
+src/components/accounts/AccountsView.tsx(5,15): error TS2305: Module '"@prisma/client"' has no exported member 'Account'.
+src/components/accounts/AccountsView.tsx(5,24): error TS2305: Module '"@prisma/client"' has no exported member 'Contact'.
+src/components/accounts/AccountsView.tsx(5,33): error TS2305: Module '"@prisma/client"' has no exported member 'Deal'.
+src/components/accounts/AccountsView.tsx(162,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/activities/ActivitiesView.tsx(5,15): error TS2305: Module '"@prisma/client"' has no exported member 'Activity'.
+src/components/activities/ActivitiesView.tsx(5,25): error TS2305: Module '"@prisma/client"' has no exported member 'User'.
+src/components/activities/ActivitiesView.tsx(273,27): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/campaigns/CampaignsView.tsx(5,15): error TS2305: Module '"@prisma/client"' has no exported member 'Campaign'.
+src/components/campaigns/CampaignsView.tsx(101,28): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/contacts/ContactsView.tsx(5,15): error TS2305: Module '"@prisma/client"' has no exported member 'Contact'.
+src/components/contacts/ContactsView.tsx(166,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/deals/KanbanBoard.tsx(22,15): error TS2305: Module '"@prisma/client"' has no exported member 'Deal'.
+src/components/deals/KanbanBoard.tsx(22,21): error TS2305: Module '"@prisma/client"' has no exported member 'Account'.
+src/components/deals/KanbanBoard.tsx(180,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/invoices/InvoicesView.tsx(5,15): error TS2305: Module '"@prisma/client"' has no exported member 'Invoice'.
+src/components/invoices/InvoicesView.tsx(5,24): error TS2305: Module '"@prisma/client"' has no exported member 'InvoiceLine'.
+src/components/invoices/InvoicesView.tsx(151,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/layout/Topbar.tsx(7,40): error TS2307: Cannot find module '@/components/ui/avatar' or its corresponding type declarations.
+src/components/layout/Topbar.tsx(15,8): error TS2307: Cannot find module '@/components/ui/dropdown-menu' or its corresponding type declarations.
+src/components/leads/LeadsTable.tsx(22,15): error TS2305: Module '"@prisma/client"' has no exported member 'Lead'.
+src/components/leads/LeadsTable.tsx(225,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/quotes/QuotesView.tsx(5,15): error TS2305: Module '"@prisma/client"' has no exported member 'Quote'.
+src/components/quotes/QuotesView.tsx(5,22): error TS2305: Module '"@prisma/client"' has no exported member 'QuoteLine'.
+src/components/quotes/QuotesView.tsx(190,25): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/lib/prisma.ts(1,10): error TS2305: Module '"@prisma/client"' has no exported member 'PrismaClient'.

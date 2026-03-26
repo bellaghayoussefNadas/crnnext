@@ -1,0 +1,22 @@
+﻿src/components/accounts/AccountsView.tsx(20,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/activities/ActivitiesView.tsx(25,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/campaigns/CampaignsView.tsx(21,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/contacts/ContactsView.tsx(20,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/deals/KanbanBoard.tsx(19,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/invoices/InvoicesView.tsx(20,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/leads/LeadsTable.tsx(20,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/leads/LeadsTable.tsx(245,9): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type '{ userId: string | null; email: string | null; value: number; id: string; createdAt: Date; updatedAt: Date; title: string; firstName: string; lastName: string; phone: string | null; ... 6 more ...; contactId: string | null; }[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type '{ userId: string | null; email: string | null; value: number; id: string; createdAt: Date; updatedAt: Date; title: string; firstName: string; lastName: string; phone: string | null; ... 6 more ...; contactId: string | null; }': userId, email, value, id, and 13 more.
+src/components/quotes/QuotesView.tsx(20,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/settings/SettingsView.tsx(9,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/ui/avatar.tsx(4,43): error TS2307: Cannot find module '@base-ui/react/avatar' or its corresponding type declarations.
+src/components/ui/badge.tsx(1,28): error TS2307: Cannot find module '@base-ui/react/merge-props' or its corresponding type declarations.
+src/components/ui/badge.tsx(2,27): error TS2307: Cannot find module '@base-ui/react/use-render' or its corresponding type declarations.
+src/components/ui/button.tsx(3,43): error TS2307: Cannot find module '@base-ui/react/button' or its corresponding type declarations.
+src/components/ui/dialog.tsx(4,43): error TS2307: Cannot find module '@base-ui/react/dialog' or its corresponding type declarations.
+src/components/ui/dropdown-menu.tsx(4,39): error TS2307: Cannot find module '@base-ui/react/menu' or its corresponding type declarations.
+src/components/ui/input.tsx(2,41): error TS2307: Cannot find module '@base-ui/react/input' or its corresponding type declarations.
+src/components/ui/select.tsx(4,43): error TS2307: Cannot find module '@base-ui/react/select' or its corresponding type declarations.
+src/components/ui/sheet.tsx(4,42): error TS2307: Cannot find module '@base-ui/react/dialog' or its corresponding type declarations.
+src/components/ui/sonner.tsx(3,26): error TS2307: Cannot find module 'next-themes' or its corresponding type declarations.
+src/components/ui/sonner.tsx(4,54): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
