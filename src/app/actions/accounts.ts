@@ -23,7 +23,7 @@ export async function createAccountAction(_s: AccountFormState, f: FormData): Pr
   if (!session) return { error: "Non autorisé" };
   const parsed = AccountSchema.safeParse(Object.fromEntries(f.entries()));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  await prisma.account.create({ data: { ...parsed.data, userId: session.userId } });
+  await prisma.account.create({ data: { ...parsed.data, userId: session.userId } as any });
   revalidatePath("/accounts");
   return { success: true };
 }
@@ -62,7 +62,22 @@ export async function createContactAction(_s: AccountFormState, f: FormData): Pr
   const parsed = ContactSchema.safeParse(raw);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const data = parsed.data;
-  await prisma.contact.create({ data: { ...data, email: data.email || null, accountId: data.accountId || null, userId: session.userId } });
+  await prisma.contact.create({ data: { ...data, email: data.email || null, accountId: data.accountId || null, userId: session.userId } as any });
+  revalidatePath("/contacts");
+  return { success: true };
+}
+
+export async function updateContactAction(id: string, _s: AccountFormState, f: FormData): Promise<AccountFormState> {
+  const session = await getSession();
+  if (!session) return { error: "Non autorisé" };
+  const raw = Object.fromEntries(f.entries());
+  const parsed = ContactSchema.safeParse(raw);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const data = parsed.data;
+  await prisma.contact.update({ 
+    where: { id },
+    data: { ...data, email: data.email || null, accountId: data.accountId || null } 
+  });
   revalidatePath("/contacts");
   return { success: true };
 }

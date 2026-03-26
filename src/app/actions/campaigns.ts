@@ -29,12 +29,42 @@ export async function createAndSendCampaignAction(_s: CampaignFormState, f: Form
   });
 
   // 2. Start the background sending process immediately (Non-blocking Next.js approach)
-  // Normally we'd use waitUntil in Vercel or a proper message queue like Redis/BullMQ.
-  // Here we just fire a promise without waiting for it.
   processCampaignInBackground(campaign.id).catch(console.error);
 
   revalidatePath("/campaigns");
   return { success: true, message: "Campagne enregistrée. Envoi en cours..." };
+}
+
+export async function updateCampaignAction(id: string, _s: CampaignFormState, f: FormData): Promise<CampaignFormState> {
+  const session = await getSession();
+  if (!session) return { error: "Non autorisé" };
+
+  const name = f.get("name") as string;
+  const subject = f.get("subject") as string;
+  const body = f.get("body") as string;
+
+  if (!name || !subject || !body) return { error: "Tous les champs sont requis" };
+
+  await prisma.campaign.update({
+    where: { id },
+    data: { name, subject, body }
+  });
+
+  revalidatePath("/campaigns");
+  return { success: true, message: "Campagne mise à jour" };
+}
+
+export async function reSendCampaignAction(id: string): Promise<CampaignFormState> {
+  const session = await getSession();
+  if (!session) return { error: "Non autorisé" };
+
+  const campaign = await prisma.campaign.findUnique({ where: { id } });
+  if (!campaign) return { error: "Campagne introuvable" };
+
+  processCampaignInBackground(campaign.id).catch(console.error);
+
+  revalidatePath("/campaigns");
+  return { success: true, message: "Ré-envoi en cours..." };
 }
 
 async function processCampaignInBackground(campaignId: string) {

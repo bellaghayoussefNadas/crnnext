@@ -16,9 +16,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Loader2, Plus, Trash2, Receipt, FileCheck, Pencil, History, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, Plus, Trash2, Receipt, FileCheck, Pencil, History, CheckCircle2, XCircle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatCurrency, cn } from "@/lib/utils";
+import { generateQuotePDF } from "@/lib/pdf";
 
 type QuoteWithRelations = Quote & {
   deal: { title: string } | null;
@@ -298,6 +299,13 @@ export default function QuotesView({ quotes, deals }: { quotes: QuoteWithRelatio
                     <span className="text-[10px] font-black uppercase tracking-tighter italic">Facturer</span>
                   </Button>
                 )}
+                <Button
+                  variant="ghost" size="sm" className="h-9 w-9 p-0 text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-500 rounded-xl transition-all"
+                  onClick={() => generateQuotePDF(q)}
+                  title="Télécharger PDF"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
                 <Button
                   variant="ghost" size="sm" className="h-9 w-9 p-0 text-muted-foreground hover:bg-primary/10 hover:text-primary rounded-xl transition-all"
                   onClick={() => { setEditQuote(q); setOpen(true); }}

@@ -44,6 +44,34 @@ export async function createActivityAction(
   return { success: true };
 }
 
+export async function updateActivityAction(
+  id: string,
+  _state: ActivityFormState,
+  formData: FormData
+): Promise<ActivityFormState> {
+  const session = await getSession();
+  if (!session) return { error: "Non autorisé" };
+
+  const raw = Object.fromEntries(formData.entries());
+  const parsed = ActivitySchema.safeParse(raw);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const data = parsed.data;
+  await prisma.activity.update({
+    where: { id },
+    data: {
+      ...data,
+      scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
+      leadId: data.leadId || null,
+      contactId: data.contactId || null,
+      accountId: data.accountId || null,
+    },
+  });
+
+  revalidatePath("/activities");
+  return { success: true };
+}
+
 export async function toggleActivityDoneAction(id: string, isDone: boolean) {
   await prisma.activity.update({
     where: { id },

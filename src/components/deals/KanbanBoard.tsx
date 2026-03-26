@@ -2,7 +2,7 @@
 
 import { useState, useOptimistic, useTransition, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import { updateDealStageAction, createDealAction, deleteDealAction } from "@/app/actions/deals";
+import { updateDealStageAction, createDealAction, deleteDealAction, updateDealAction } from "@/app/actions/deals";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,15 +15,28 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Loader2, Plus, Trash2, GripVertical, Trophy, Sparkles, Filter, LayoutGrid } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, Trophy, Sparkles, Filter, LayoutGrid, Pencil, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useActionState } from "react";
 import type { Deal, Account } from "@prisma/client";
+import { createInvoiceFromDealAction } from "@/app/actions/invoices";
 
 type DealWithAccount = Deal & { account: Account | null, stage: any | null, stageId: string | null };
 
-function DealCard({ deal, index }: { deal: DealWithAccount; index: number }) {
+function DealCard({ deal, index, onEdit }: { deal: DealWithAccount; index: number; onEdit: (deal: DealWithAccount) => void }) {
+  const [, startTransition] = useTransition();
+
+  const handleFacture = () => {
+    if (confirm(`Générer une facture brouillon pour : ${deal.title} ?`)) {
+      startTransition(async () => {
+        const res = await createInvoiceFromDealAction(deal.id);
+        if (res.success) toast.success("Facture brouillon générée !");
+        else toast.error(res.error || "Erreur lors de la facturation");
+      });
+    }
+  };
+
   return (
     <Draggable draggableId={deal.id} index={index}>
       {(provided, snapshot) => (
@@ -41,6 +54,19 @@ function DealCard({ deal, index }: { deal: DealWithAccount; index: number }) {
               {deal.title}
             </h4>
             <div className="flex items-center gap-1 shrink-0 mt-0.5">
+               <button
+                  onClick={handleFacture}
+                  className="opacity-0 group-hover/card:opacity-100 p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-500/10 transition-all"
+                  title="Facturer cette opportunité"
+                >
+                  <Receipt className="w-3.5 h-3.5" />
+                </button>
+               <button
+                  onClick={() => onEdit(deal)}
+                  className="opacity-0 group-hover/card:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
                <button
                   onClick={() => { if (confirm("Supprimer ce deal définitivement ?")) deleteDealAction(deal.id); }}
                   className="opacity-0 group-hover/card:opacity-100 p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm"
@@ -89,31 +115,43 @@ function DealCard({ deal, index }: { deal: DealWithAccount; index: number }) {
   );
 }
 
-function NewDealForm({ onClose, stages }: { onClose: () => void, stages: any[] }) {
-  const [state, formAction, pending] = useActionState(createDealAction, {});
+function DealForm({ 
+  onClose, 
+  stages, 
+  deal 
+}: { 
+  onClose: () => void, 
+  stages: any[], 
+  deal?: DealWithAccount 
+}) {
+  const action = deal ? updateDealAction.bind(null, deal.id) : createDealAction;
+  const [state, formAction, pending] = useActionState(action, {});
 
   useEffect(() => {
-    if (state?.success) { toast.success("Deal créé avec succès"); onClose(); }
+    if (state?.success) { 
+      toast.success(deal ? "Deal actualisé" : "Deal créé avec succès"); 
+      onClose(); 
+    }
     if (state?.error) toast.error(state.error);
-  }, [state, onClose]);
+  }, [state, onClose, deal]);
 
   return (
     <form action={formAction} className="space-y-6 pt-6 px-1">
       <div className="space-y-2">
         <Label htmlFor="d-title" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Titre de l&apos;opportunité *</Label>
-        <Input id="d-title" name="title" required className="h-12 rounded-2xl bg-muted/30 border-transparent focus:bg-background transition-all font-bold placeholder:italic" placeholder="Ex: Contrat de services Cloud" />
+        <Input id="d-title" name="title" defaultValue={deal?.title} required className="h-12 rounded-2xl bg-muted/30 border-transparent focus:bg-background transition-all font-bold placeholder:italic" placeholder="Ex: Contrat de services Cloud" />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="d-amount" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Montant estimé (TND)</Label>
-          <Input id="d-amount" name="amount" type="number" min="0" defaultValue={0} className="h-12 rounded-2xl bg-muted/30 border-transparent font-bold" />
+          <Input id="d-amount" name="amount" type="number" min="0" defaultValue={deal?.amount || 0} className="h-12 rounded-2xl bg-muted/30 border-transparent font-bold" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="d-stage" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Étape Pipeline</Label>
           <select
             id="d-stage"
             name="stageId"
-            defaultValue={stages[0]?.id}
+            defaultValue={deal?.stageId || stages[0]?.id}
             className="w-full h-12 rounded-2xl border-transparent bg-muted/30 px-4 text-sm font-bold focus:bg-background transition-all outline-none"
           >
             {stages.map((c) => (
@@ -123,13 +161,17 @@ function NewDealForm({ onClose, stages }: { onClose: () => void, stages: any[] }
         </div>
       </div>
       <div className="space-y-2">
+        <Label htmlFor="d-probability" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Probabilité (%)</Label>
+        <Input id="d-probability" name="probability" type="number" min="0" max="100" defaultValue={deal?.probability || 20} className="h-12 rounded-2xl bg-muted/30 border-transparent font-bold" />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="d-notes" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Notes prospectives</Label>
-        <Textarea id="d-notes" name="notes" rows={4} className="rounded-2xl bg-muted/30 border-transparent focus:bg-background transition-all font-medium" />
+        <Textarea id="d-notes" name="notes" defaultValue={deal?.notes || ""} rows={4} className="rounded-2xl bg-muted/30 border-transparent focus:bg-background transition-all font-medium" />
       </div>
       <div className="flex gap-3 pt-4">
         <Button type="submit" disabled={pending} className="flex-1 h-14 bg-primary rounded-2xl font-black text-white hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
           {pending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          Lancer l&apos;opportunité
+          {deal ? "Mettre à jour" : "Lancer l'opportunité"}
         </Button>
       </div>
     </form>
@@ -144,6 +186,7 @@ export default function KanbanBoard({
   initialStages: any[] 
 }) {
   const [open, setOpen] = useState(false);
+  const [editingDeal, setEditingDeal] = useState<DealWithAccount | undefined>();
   const [, startTransition] = useTransition();
 
   const [optimisticDeals, updateOptimistic] = useOptimistic(
@@ -185,7 +228,7 @@ export default function KanbanBoard({
               <Badge variant="outline" className="rounded-full bg-emerald-500/10 border-emerald-500/20 text-emerald-500 border-dashed font-black px-3 py-0.5 text-[10px] tracking-widest">LIVE PIPELINE</Badge>
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-40 italic underline decoration-primary/40 underline-offset-4 decoration-2">Flux de Conversion Commerciale</span>
            </div>
-           <h1 className="text-4xl font-black text-foreground tracking-tighter flex items-center gap-4">
+           <h1 className="text-4xl font-black text-foreground tracking-tighter flex items-center gap-4 italic uppercase">
              Gestion du Pipeline
              <Sparkles className="w-8 h-8 text-primary animate-pulse" />
            </h1>
@@ -195,22 +238,31 @@ export default function KanbanBoard({
            </p>
         </div>
         <div className="flex items-center gap-3">
-           <Button variant="outline" className="rounded-2xl h-12 px-6 font-bold border-border/40 hover:bg-muted/40 transition-all border-dashed">
+           <Button variant="outline" className="rounded-2xl h-12 px-6 font-bold border-border/40 hover:bg-muted/40 transition-all border-dashed uppercase text-[10px] tracking-widest italic">
               <Filter className="w-4 h-4 mr-2" />
               Filtrer Vue
            </Button>
            <Sheet open={open} onOpenChange={setOpen}>
              <SheetTrigger render={
-               <Button className="rounded-2xl h-12 px-8 font-black bg-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all text-white">
-                 <Plus className="w-5 h-5 mr-2" />
+               <Button 
+                onClick={() => { setEditingDeal(undefined); setOpen(true); }}
+                className="rounded-2xl h-12 px-8 font-black bg-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all text-white uppercase italic tracking-widest"
+               >
+                 <Plus className="w-5 h-5 mr-3" />
                  Nouveau Deal
                </Button>
              } />
              <SheetContent className="overflow-y-auto sm:max-w-md">
                <SheetHeader className="pb-4 border-b border-border/40">
-                 <SheetTitle className="text-2xl font-black italic tracking-tighter uppercase">Initialiser Opportunité</SheetTitle>
+                 <SheetTitle className="text-2xl font-black italic tracking-tighter uppercase">
+                   {editingDeal ? "Éditer l'Opportunité" : "Initialiser Opportunité"}
+                 </SheetTitle>
                </SheetHeader>
-               <NewDealForm onClose={() => setOpen(false)} stages={initialStages} />
+               <DealForm 
+                 onClose={() => setOpen(false)} 
+                 stages={initialStages} 
+                 deal={editingDeal}
+               />
              </SheetContent>
            </Sheet>
         </div>
@@ -235,7 +287,7 @@ export default function KanbanBoard({
                     </span>
                     <div className="flex items-center gap-2">
                        <span className="text-xl font-black text-foreground italic">{cards.length}</span>
-                       <Badge className={cn("border-0 text-[9px] font-black uppercase px-2 py-0", col.color)}>
+                       <Badge className={cn("border-0 text-[10px] font-black uppercase px-2 py-0", col.color)}>
                          ACTIF
                        </Badge>
                     </div>
@@ -259,7 +311,12 @@ export default function KanbanBoard({
                       )}
                     >
                       {cards.map((deal, index) => (
-                        <DealCard key={deal.id} deal={deal} index={index} />
+                        <DealCard 
+                          key={deal.id} 
+                          deal={deal} 
+                          index={index} 
+                          onEdit={(d) => { setEditingDeal(d); setOpen(true); }}
+                        />
                       ))}
                       {provided.placeholder}
                     </div>
