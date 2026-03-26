@@ -27,7 +27,7 @@ export async function createQuoteAction(_s: QuoteFormState, f: FormData): Promis
       user: { connect: { id: session.userId } },
       number,
       title,
-      dealId: dealId || null,
+      deal: dealId ? { connect: { id: dealId } } : undefined,
       validUntil: validUntilStr ? new Date(validUntilStr) : null,
       totalAmount,
       lines: {
@@ -64,7 +64,7 @@ export async function updateQuoteAction(id: string, _s: QuoteFormState, f: FormD
       data: {
         title,
         status: status as any,
-        dealId: dealId || null,
+        deal: dealId ? { connect: { id: dealId } } : undefined,
         validUntil: validUntilStr ? new Date(validUntilStr) : null,
         totalAmount,
         lines: {
